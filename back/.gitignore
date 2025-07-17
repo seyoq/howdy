@@ -1,0 +1,9 @@
+back/*.json
+back/*.json
+venv/
+back/venv/
+*.pyc
+__pycache__/
+*.log
+*.sqlite3
+*.env

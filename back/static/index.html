@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>음성 인식 일기 - API 테스트 페이지</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .api-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .api-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            background: #fff;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .result.success {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+        
+        .result.error {
+            border-color: #dc3545;
+            background: #fff5f5;
+            color: #dc3545;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #28a745;
+        }
+        
+        .status-offline {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 음성 인식 일기 프로젝트</h1>
+            <p>API 테스트 페이지 - 텍스트 입력하고 결과 확인하기</p>
+            <div style="margin-top: 20px;">
+                <span class="status-indicator" id="statusIndicator"></span>
+                <span id="statusText">서버 상태 확인 중...</span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 감정 분석 섹션 -->
+            <div class="api-section">
+                <h2><span class="emoji">🤖</span>감정 분석 API</h2>
+                <form id="emotionForm">
+                    <div class="form-group">
+                        <label for="emotionText">분석할 텍스트:</label>
+                        <textarea id="emotionText" placeholder="감정을 분석하고 싶은 텍스트를 입력하세요...">오늘은 정말 힘든 하루였다. 프로젝트 회의도 하고 역할 분배도 해서 프로젝트를 본격적으로 시작한 하루였다. 잠도 많이 못 자고 와서 정말 피곤했지만 그래도 나름 뿌듯한 하루였다고 생각한다.</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="emotionUserId">사용자 ID:</label>
+                        <input type="text" id="emotionUserId" value="test_user" placeholder="사용자 ID를 입력하세요">
+                    </div>
+                    <button type="submit" class="btn">감정 분석 실행</button>
+                </form>
+                <div class="loading" id="emotionLoading">
+                    <div class="spinner"></div>
+                    <div>AI가 감정을 분석하고 있습니다...</div>
+                </div>
+                <div class="result" id="emotionResult"></div>
+            </div>
+
+            <!-- 피드백 생성 섹션 -->
+            <div class="api-section">
+                <h2><span class="emoji">💬</span>피드백 생성 API</h2>
+                <form id="feedbackForm">
+                    <div class="form-group">
+                        <label for="feedbackText">피드백을 생성할 텍스트:</label>
+                        <textarea id="feedbackText" placeholder="피드백을 받고 싶은 텍스트를 입력하세요...">오늘 친구들이랑 수영장에 가서 물놀이를 했다. 맛있는 것도 많이 먹고 재밌게 놀아서 너무 즐거운 하루였다.</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="feedbackStyle">MBTI 피드백 스타일:</label>
+                            <select id="feedbackStyle">
+                                <option value="thinking" selected>T형 (사고형) - 논리적/분석적</option>
+                                <option value="feeling">F형 (감정형) - 공감적/지지적</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="feedbackUserId">사용자 ID:</label>
+                        <input type="text" id="feedbackUserId" value="test_user" placeholder="사용자 ID를 입력하세요">
+                    </div>
+                    <button type="submit" class="btn">피드백 생성</button>
+                </form>
+                <div class="loading" id="feedbackLoading">
+                    <div class="spinner"></div>
+                    <div>AI가 감정을 분석하고 MBTI 기반 피드백을 생성하고 있습니다...</div>
+                </div>
+                <div class="result" id="feedbackResult"></div>
+            </div>
+
+            <!-- 일기 저장 섹션 -->
+            <div class="api-section">
+                <h2><span class="emoji">📝</span>일기 저장 API</h2>
+                <form id="diaryForm">
+                    <div class="form-group">
+                        <label for="diaryTitle">일기 제목:</label>
+                        <input type="text" id="diaryTitle" placeholder="일기 제목을 입력하세요..." value="오늘의 하루">
+                    </div>
+                    <div class="form-group">
+                        <label for="diaryContent">일기 내용:</label>
+                        <textarea id="diaryContent" placeholder="일기 내용을 입력하세요...">오늘은 새로운 프로젝트를 시작하는 날이었다. 팀원들과 함께 계획을 세우고 역할을 분담했다. 처음에는 걱정이 많았지만 다들 열정적이어서 기분이 좋았다. 앞으로 어떤 결과가 나올지 기대된다.</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="diaryDate">날짜:</label>
+                            <input type="date" id="diaryDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="diaryTags">태그 (쉼표로 구분):</label>
+                            <input type="text" id="diaryTags" placeholder="태그1, 태그2, 태그3..." value="프로젝트, 팀워크, 시작">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">일기 저장</button>
+                </form>
+                <div class="loading" id="diaryLoading">
+                    <div class="spinner"></div>
+                    <div>일기를 저장하고 분석 중입니다...</div>
+                </div>
+                <div class="result" id="diaryResult"></div>
+            </div>
+
+            <!-- 통계 조회 섹션 -->
+            <div class="api-section">
+                <h2><span class="emoji">📊</span>감정 통계 API</h2>
+                <form id="statisticsForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="statsUserId">사용자 ID:</label>
+                            <input type="text" id="statsUserId" value="test_user" placeholder="사용자 ID를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="statsPeriod">조회 기간:</label>
+                            <select id="statsPeriod">
+                                <option value="day">일간</option>
+                                <option value="week" selected>주간</option>
+                                <option value="month">월간</option>
+                                <option value="year">연간</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="statsStartDate">시작 날짜 (선택사항):</label>
+                            <input type="date" id="statsStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="statsEndDate">종료 날짜 (선택사항):</label>
+                            <input type="date" id="statsEndDate">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">통계 조회</button>
+                </form>
+                <div class="loading" id="statisticsLoading">
+                    <div class="spinner"></div>
+                    <div>감정 통계를 분석하고 있습니다...</div>
+                </div>
+                <div class="result" id="statisticsResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 기본 URL
+        const API_BASE_URL = 'http://localhost:8000/api/v1';
+        
+        // 페이지 로드 시 서버 상태 확인
+        window.addEventListener('DOMContentLoaded', checkServerStatus);
+        
+        // 오늘 날짜로 초기화
+        document.getElementById('diaryDate').valueAsDate = new Date();
+        
+        // 서버 상태 확인
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('statusIndicator').className = 'status-indicator status-online';
+                    document.getElementById('statusText').textContent = '서버 온라인';
+                } else {
+                    throw new Error('서버 상태 불량');
+                }
+            } catch (error) {
+                document.getElementById('statusIndicator').className = 'status-indicator status-offline';
+                document.getElementById('statusText').textContent = '서버 오프라인';
+            }
+        }
+        
+        // 감정 분석 폼 처리
+        document.getElementById('emotionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = document.getElementById('emotionText').value;
+            const userId = document.getElementById('emotionUserId').value;
+            
+            if (!text.trim()) {
+                alert('분석할 텍스트를 입력해주세요.');
+                return;
+            }
+            
+            showLoading('emotionLoading');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/emotion/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        user_id: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('emotionResult', JSON.stringify(data, null, 2), 'success');
+                } else {
+                    showResult('emotionResult', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                showResult('emotionResult', `오류: ${error.message}`, 'error');
+            } finally {
+                hideLoading('emotionLoading');
+            }
+        });
+        
+        // 피드백 생성 폼 처리
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = document.getElementById('feedbackText').value;
+            const style = document.getElementById('feedbackStyle').value;
+            const userId = document.getElementById('feedbackUserId').value;
+            
+            if (!text.trim()) {
+                alert('피드백을 생성할 텍스트를 입력해주세요.');
+                return;
+            }
+            
+            showLoading('feedbackLoading');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/feedback/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        style: style,
+                        user_id: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('feedbackResult', JSON.stringify(data, null, 2), 'success');
+                } else {
+                    showResult('feedbackResult', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                showResult('feedbackResult', `오류: ${error.message}`, 'error');
+            } finally {
+                hideLoading('feedbackLoading');
+            }
+        });
+        
+        // 일기 저장 폼 처리
+        document.getElementById('diaryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('diaryTitle').value;
+            const content = document.getElementById('diaryContent').value;
+            const date = document.getElementById('diaryDate').value;
+            const tags = document.getElementById('diaryTags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+            
+            if (!content.trim()) {
+                alert('일기 내용을 입력해주세요.');
+                return;
+            }
+            
+            showLoading('diaryLoading');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/diary/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        content: content,
+                        date: date,
+                        tags: tags,
+                        is_private: true,
+                        analyze_emotion: true,
+                        generate_feedback: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('diaryResult', JSON.stringify(data, null, 2), 'success');
+                } else {
+                    showResult('diaryResult', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                showResult('diaryResult', `오류: ${error.message}`, 'error');
+            } finally {
+                hideLoading('diaryLoading');
+            }
+        });
+        
+        // 통계 조회 폼 처리
+        document.getElementById('statisticsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('statsUserId').value;
+            const period = document.getElementById('statsPeriod').value;
+            const startDate = document.getElementById('statsStartDate').value;
+            const endDate = document.getElementById('statsEndDate').value;
+            
+            if (!userId.trim()) {
+                alert('사용자 ID를 입력해주세요.');
+                return;
+            }
+            
+            showLoading('statisticsLoading');
+            
+            try {
+                let url = `${API_BASE_URL}/statistics/emotion/${userId}?period=${period}`;
+                if (startDate) url += `&start_date=${startDate}`;
+                if (endDate) url += `&end_date=${endDate}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('statisticsResult', JSON.stringify(data, null, 2), 'success');
+                } else {
+                    showResult('statisticsResult', JSON.stringify(data, null, 2), 'error');
+                }
+            } catch (error) {
+                showResult('statisticsResult', `오류: ${error.message}`, 'error');
+            } finally {
+                hideLoading('statisticsLoading');
+            }
+        });
+        
+        // 로딩 표시
+        function showLoading(elementId) {
+            document.getElementById(elementId).classList.add('active');
+        }
+        
+        // 로딩 숨김
+        function hideLoading(elementId) {
+            document.getElementById(elementId).classList.remove('active');
+        }
+        
+        // 결과 표시
+        function showResult(elementId, content, type) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.textContent = content;
+            resultElement.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html> 
