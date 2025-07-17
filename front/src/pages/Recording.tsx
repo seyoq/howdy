@@ -193,7 +193,7 @@ const saveComicToFirestore = async ({
   
       if (audioBlob.size === 0) {
         console.error('오디오 파일이 비어있습니다!');
-        navigate('/emotion-selection');
+        // navigate('/emotion-selection');
         return;
       }
   
