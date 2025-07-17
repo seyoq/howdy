@@ -256,7 +256,7 @@ const saveComicToFirestore = async ({
       }
     } catch (error) {
       console.error('음성 처리 실패:', error);
-      navigate('/emotion-selection');
+      navigate('/');
     } finally {
       setIsProcessing(false);
     }
