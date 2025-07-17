@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+:root {
+    --background: 210 20% 98%; /* 포그화이트 */
+    --foreground: 0 0% 20%; /* 차콜 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%; /* 차콜 */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%; /* 차콜 */
+
+    --primary: 42 100% 85%; /* 피치스킨 */
+    --primary-foreground: 0 0% 20%; /* 차콜 */
+
+    --secondary: 178 60% 78%; /* 민트오로라 */
+    --secondary-foreground: 0 0% 20%; /* 차콜 */
+
+    --muted: 210 20% 95%; /* 포그화이트 약간 어둡게 */
+    --muted-foreground: 0 0% 45%; /* 차콜 연하게 */
+
+    --accent: 178 60% 78%; /* 민트오로라 */
+    --accent-foreground: 0 0% 20%; /* 차콜 */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 20% 90%; /* 포그화이트 어둡게 */
+    --input: 210 20% 90%; /* 포그화이트 어둡게 */
+    --ring: 42 100% 85%; /* 피치스킨 */
+
+    /* Custom colors for emotion diary - 새로운 팔레트에 맞춘 감정 색상 */
+    --happy: 60 70% 75%; /* 따뜻한 노랑 */
+    --sad: 220 40% 70%; /* 부드러운 파랑 */
+    --angry: 0 50% 70%; /* 부드러운 빨강 */
+    --excited: 300 50% 80%; /* 부드러운 보라 */
+    --calm: 178 40% 70%; /* 민트 계열 */
+    --anxious: 30 50% 75%; /* 따뜻한 오렌지 */
+    
+    /* Gradients - 피치스킨과 민트오로라 기반 */
+    --gradient-primary: linear-gradient(135deg, hsl(42 100% 85%), hsl(178 60% 78%));
+    --gradient-header: linear-gradient(135deg, hsl(42 90% 80%), hsl(178 50% 75%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(210 20% 98%));
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px hsl(42 100% 85% / 0.15);
+    --shadow-card: 0 2px 10px hsl(0 0% 20% / 0.08);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 210 20% 98%; /* 포그화이트 */
+    --sidebar-foreground: 0 0% 20%; /* 차콜 */
+    --sidebar-primary: 42 100% 85%; /* 피치스킨 */
+    --sidebar-primary-foreground: 0 0% 20%; /* 차콜 */
+    --sidebar-accent: 178 60% 78%; /* 민트오로라 */
+    --sidebar-accent-foreground: 0 0% 20%; /* 차콜 */
+    --sidebar-border: 210 20% 90%; /* 포그화이트 어둡게 */
+    --sidebar-ring: 42 100% 85%; /* 피치스킨 */
+  }
+
+  .dark {
+    --background: 0 0% 15%; /* 다크 배경 */
+    --foreground: 210 20% 98%; /* 밝은 텍스트 */
+
+    --card: 0 0% 18%; /* 다크 카드 */
+    --card-foreground: 210 20% 98%; /* 밝은 텍스트 */
+
+    --popover: 0 0% 18%; /* 다크 팝오버 */
+    --popover-foreground: 210 20% 98%; /* 밝은 텍스트 */
+
+    --primary: 42 80% 70%; /* 다크 모드 피치스킨 */
+    --primary-foreground: 0 0% 15%; /* 다크 텍스트 */
+
+    --secondary: 178 40% 60%; /* 다크 모드 민트오로라 */
+    --secondary-foreground: 210 20% 98%; /* 밝은 텍스트 */
+
+    --muted: 0 0% 25%; /* 다크 뮤트 */
+    --muted-foreground: 210 20% 65%; /* 밝은 뮤트 텍스트 */
+
+    --accent: 178 40% 60%; /* 다크 모드 민트오로라 */
+    --accent-foreground: 210 20% 98%; /* 밝은 텍스트 */
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 25%; /* 다크 보더 */
+    --input: 0 0% 25%; /* 다크 인풋 */
+    --ring: 42 80% 70%; /* 다크 모드 피치스킨 */
+    
+    --sidebar-background: 0 0% 15%; /* 다크 사이드바 */
+    --sidebar-foreground: 210 20% 98%; /* 밝은 텍스트 */
+    --sidebar-primary: 42 80% 70%; /* 다크 모드 피치스킨 */
+    --sidebar-primary-foreground: 0 0% 15%; /* 다크 텍스트 */
+    --sidebar-accent: 178 40% 60%; /* 다크 모드 민트오로라 */
+    --sidebar-accent-foreground: 210 20% 98%; /* 밝은 텍스트 */
+    --sidebar-border: 0 0% 25%; /* 다크 보더 */
+    --sidebar-ring: 42 80% 70%; /* 다크 모드 피치스킨 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer utilities {
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 커스텀 애니메이션 */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-wave {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-pulse-wave {
+    animation: pulse-wave 2s ease-out infinite;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 0.6s;
+  }
+
+  /* 녹음 파동 효과 */
+  .recording-waves {
+    position: relative;
+  }
+
+  .recording-waves::before,
+  .recording-waves::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(20, 184, 166, 0.3);
+    border-radius: 50%;
+    animation: pulse-wave 2s ease-out infinite;
+  }
+
+  .recording-waves::before {
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+  }
+
+  .recording-waves::after {
+    width: 200px;
+    height: 200px;
+    animation-delay: 0.5s;
+  }
+}
