@@ -202,7 +202,7 @@ const saveComicToFirestore = async ({
       formData.append('audio', audioFile);
   
       // ✅ 1단계: STT 변환
-      const sttResponse = await fetch('http://localhost:8000/api/speech-to-text', {
+      const sttResponse = await fetch('https://ec7690215f6d.ngrok-free.app/api/speech-to-text', {
         method: 'POST',
         body: formData
       });
@@ -225,7 +225,7 @@ const saveComicToFirestore = async ({
         diary_text: sttResult.text
       };
   
-      const comicResponse = await fetch("http://localhost:8000/generate-comic", {
+      const comicResponse = await fetch("https://ec7690215f6d.ngrok-free.app/generate-comic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(comicRequestBody),
